@@ -30,9 +30,12 @@ def bag_of_words_multilayer_perceptron(features, labels, mode, params):
             # Create output for the TensorBoard Projector
             config = projector.ProjectorConfig()
             word_embedding = config.embeddings.add()
+            #sentence_embedding = config.embeddings.add()
             # The name of the embedding tensor was discovered by using TensorBoard.
             word_embedding.tensor_name = 'MLP/input_layer/words_embedding/embedding_weights'
             word_embedding.metadata_path = path.join(getcwd(), FLAGS.word_meta_file)
+            #sentence_embedding.tensor_name = bow.name
+            #sentence_embedding.metadata_path = path.join(getcwd(), FLAGS.sent_meta_file)
             writer = tf.summary.FileWriter(FLAGS.model_dir)
             projector.visualize_embeddings(writer, config)
 

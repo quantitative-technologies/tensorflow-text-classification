@@ -113,7 +113,6 @@ def create_parser_training(model_dir=None, n_epochs=None, batch_size=None, learn
         default=NP_SEED,
         help='Random Seed for Numpy. Used for shuffling and splitting data.')
 
-
     return parser
 
 
@@ -389,7 +388,7 @@ def estimator_spec_for_softmax_classification(logits, labels, mode, params):
         with tf.name_scope('OptimizeLoss'):
             optimizer = tf.train.AdamOptimizer(learning_rate=params.learning_rate)
             train_op = optimizer.minimize(loss, global_step=tf.train.get_global_step())
-        return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)
+        return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 
     # mode == EVAL
     eval_metric_ops = {

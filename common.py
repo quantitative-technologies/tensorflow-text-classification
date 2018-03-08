@@ -146,12 +146,18 @@ Data processing
 
 
 def get_data(data_directory, classes_only=False):
-    """Load data from the data_directory."""
-    classes = pd.read_csv(path.join(data_directory, 'classes.txt'), header=None, names=['class'])
+    """Download the DBPedia data if necessary, and load data from the data_directory."""
+    # The function call load_dataset in the TensorFlow API is supposed to do this. However, there are currently issues:
+    # https://github.com/tensorflow/tensorflow/issues/14698
+
+    # Download the data if necessary, using the API.
+    tf.contrib.learn.datasets.text_datasets.maybe_download_dbpedia(data_directory)
+    csv_subdir = 'dbpedia_csv'
+    classes = pd.read_csv(path.join(data_directory, csv_subdir, 'classes.txt'), header=None, names=['class'])
     if classes_only:
         return classes
-    train_raw = pd.read_csv(path.join(data_directory, 'train.csv'), header=None)
-    test_raw = pd.read_csv(path.join(data_directory, 'test.csv'), header=None)
+    train_raw = pd.read_csv(path.join(data_directory, csv_subdir, 'train.csv'), header=None)
+    test_raw = pd.read_csv(path.join(data_directory, csv_subdir, 'test.csv'), header=None)
     longest_sent = max([len(sent) for sent in tf.contrib.learn.preprocessing.tokenizer(train_raw[2])])
     print("The longest sentence in the training data has {} words.".format(longest_sent))
 

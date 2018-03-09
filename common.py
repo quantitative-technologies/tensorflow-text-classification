@@ -1,4 +1,4 @@
-from os import path, makedirs
+from os import path, makedirs, rename, remove
 from time import time
 import argparse
 import pickle
@@ -146,18 +146,38 @@ Data processing
 
 
 def get_data(data_directory, classes_only=False):
-    """Download the DBPedia data if necessary, and load data from the data_directory."""
-    # The function call load_dataset in the TensorFlow API is supposed to do this. However, there are currently issues:
-    # https://github.com/tensorflow/tensorflow/issues/14698
+    """Download the DBpedia data if necessary, and load data from the data_directory. If the files train.csv, test.csv
+       and classes.txt are all in data_directory, then they are used (no download)."""
+    # The function call load_dataset in the TensorFlow API is supposed to provide this functionality. However, there are
+    # currently issues: https://github.com/tensorflow/tensorflow/issues/14698
 
-    # Download the data if necessary, using the API.
-    tf.contrib.learn.datasets.text_datasets.maybe_download_dbpedia(data_directory)
-    csv_subdir = 'dbpedia_csv'
-    classes = pd.read_csv(path.join(data_directory, csv_subdir, 'classes.txt'), header=None, names=['class'])
+    train_filename = path.join(data_directory, 'train.csv')
+    test_filename = path.join(data_directory, 'test.csv')
+    classes_filename = path.join(data_directory, 'classes.txt')
+    has_train = path.isfile(train_filename)
+    has_test = path.isfile(test_filename)
+    has_classes = path.isfile(classes_filename)
+
+    if not has_train or not has_test or not has_classes:
+        # Download the data if necessary, using the API.
+        tf.contrib.learn.datasets.text_datasets.maybe_download_dbpedia(data_directory)
+        csv_subdir = 'dbpedia_csv'
+
+        if has_train:
+            remove(train_filename)
+        rename(path.join(data_directory, csv_subdir, 'train.csv'), train_filename)
+        if has_test:
+            remove(test_filename)
+        rename(path.join(data_directory, csv_subdir, 'test.csv'), test_filename)
+        if has_classes:
+            remove(classes_filename)
+        rename(path.join(data_directory, csv_subdir, 'classes.txt'), classes_filename)
+
+    classes = pd.read_csv(classes_filename, header=None, names=['class'])
     if classes_only:
         return classes
-    train_raw = pd.read_csv(path.join(data_directory, csv_subdir, 'train.csv'), header=None)
-    test_raw = pd.read_csv(path.join(data_directory, csv_subdir, 'test.csv'), header=None)
+    train_raw = pd.read_csv(train_filename, header=None)
+    test_raw = pd.read_csv(test_filename, header=None)
     longest_sent = max([len(sent) for sent in tf.contrib.learn.preprocessing.tokenizer(train_raw[2])])
     print("The longest sentence in the training data has {} words.".format(longest_sent))
 
@@ -226,22 +246,24 @@ def preprocess_data(flags):
        NOTE: If the max_doc_len changes from a previous run, then DATA_FILENAME should be deleted so that it can be
        properly recreated."""
 
-    data_path = path.join(flags.model_dir, DATA_FILENAME)
-    if path.isfile(data_path):
-        with open(data_path, 'rb') as f:
+    preprocessed_path = path.join(flags.model_dir, DATA_FILENAME)
+    if path.isfile(preprocessed_path):
+        with open(preprocessed_path, 'rb') as f:
             train_raw, x_train, y_train, x_test, y_test, classes = pickle.load(f)
     else:
         train_raw, test_raw, classes = get_data(flags.data_dir)
 
-        # Seeding is necessary for reproducability.
+        # Seeding is necessary for reproducibility.
         np.random.seed(flags.np_seed)
         # Shuffle data to make the distribution of classes roughly stratified for each mini-batch.
         # This is not necessary for full batch training, but is essential for mini-batch training.
         train_raw = shuffle(train_raw)
         test_raw = shuffle(test_raw)
         train_sentences, y_train, test_sentences, y_test = extract_data(train_raw, test_raw)
-        x_train, x_test, vocabulary_processor, n_words = process_vocabulary(train_sentences, test_sentences, flags)
-        with open(data_path, 'wb') as f:
+        x_train, x_test, _, _ = process_vocabulary(train_sentences, test_sentences, flags)
+
+        # Save the processed data to avoid re-processing.
+        with open(preprocessed_path, 'wb') as f:
             pickle.dump([train_raw, x_train, y_train, x_test, y_test, classes], f)
 
     return train_raw, x_train, y_train, x_test, y_test, classes
@@ -349,7 +371,8 @@ def create_metadata(train_raw, classes, flags):
         print("Creating word-embedding metadata for TensorBoard...")
         # Create the word-embedding metadata file. This is the vocabulary listed in the order its enumeration
         # for the embedding.
-        vocabulary_processor = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(flags.vocab_processor_file)
+        vocabulary_processor_path = path.join(flags.model_dir, flags.vocab_processor_file)
+        vocabulary_processor = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(vocabulary_processor_path)
 
         vocab = vocabulary_processor.vocabulary_._mapping
         with open(word_embedding_metadata_filename, 'w') as f:

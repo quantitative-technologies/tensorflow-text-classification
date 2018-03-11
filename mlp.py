@@ -23,7 +23,7 @@ def bag_of_words_multilayer_perceptron(features, labels, mode, params):
         bow = tf.feature_column.input_layer(
             features,
             feature_columns=[bow_embedding_column])
-        bow_active = tf.nn.sigmoid(bow)
+        bow_active = tf.nn.relu(bow)
         logits = tf.layers.dense(bow_active, params.output_dim, activation=None)
 
         if mode == tf.estimator.ModeKeys.TRAIN:

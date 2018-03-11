@@ -405,7 +405,6 @@ def estimator_spec_for_softmax_classification(logits, labels, mode, params):
                 'class': tf.estimator.export.PredictOutput(predicted_class)
             })
 
-    #onehot_labels = tf.one_hot(labels, params.output_dim, 1, 0)
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
     if mode == tf.estimator.ModeKeys.TRAIN:
         with tf.name_scope('OptimizeLoss'):

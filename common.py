@@ -6,7 +6,6 @@ import pickle
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from tensorflow.contrib.learn import learn_runner
 from sklearn.utils import shuffle
 
 DATA_DIRECTORY = 'data'
@@ -275,7 +274,7 @@ Modelling: Training, evaluation and prediction. Also metadata for TensorBoard.
 
 
 def input_fn(x, y=None, batch_size=None, num_epochs=None, shuffle=False):
-    """Generic input function to be used as then input_fn arguments for Experiment or directly with Estimators."""
+    """Generic input function to be used as the input_fn arguments for Experiment or directly with Estimators."""
     if batch_size is None and x is not None:
         batch_size = len(x)
     return tf.estimator.inputs.numpy_input_fn(
@@ -294,12 +293,11 @@ def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags):
         seed=flags.tf_seed,
         batch_size=flags.batch_size,
         learning_rate=flags.learning_rate,
-        output_dim=flags.output_dim
-    )
+        output_dim=flags.output_dim)
     if hasattr(flags, 'embed_dim'):
         hparams.embed_dim = flags.embed_dim
-    is_training = schedule in ['train', 'train_and_evaluate']
 
+    is_training = schedule in ['train', 'train_and_evaluate']
     run_config = tf.contrib.learn.RunConfig()
     try:
         checkpoint_steps = len(x_train) / flags.checkpoints_per_epoch / flags.batch_size if is_training else None
@@ -309,37 +307,33 @@ def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags):
         checkpoint_steps = 1
         log_step_count_steps = 1
     run_config = run_config.replace(model_dir=flags.model_dir,
-                                    #save_summary_steps= 500,
                                     save_checkpoints_steps=checkpoint_steps,
                                     log_step_count_steps=log_step_count_steps,
                                     tf_random_seed=hparams.seed)
 
-    # We want this after experiment_fn returns.
-    estimator = tf.estimator.Estimator(
-        model_fn=model_fn,
-        config=run_config,
-        params=hparams
-    )
-
     def experiment_fn(run_config, hparams):
+        estimator = tf.estimator.Estimator(
+            model_fn=model_fn,
+            config=run_config,
+            params=hparams)
         experiment = tf.contrib.learn.Experiment(
             estimator=estimator,
             train_input_fn=input_fn(x_train, y_train,
-                                    batch_size=hparams.batch_size, num_epochs=hparams.n_epochs, shuffle=True),
+                                    batch_size=hparams.batch_size,
+                                    num_epochs=hparams.n_epochs,
+                                    shuffle=True),
             eval_input_fn=input_fn(x_dev, y_dev,
                                    num_epochs=1),
-            eval_delay_secs=0
-        )
+            eval_delay_secs=0)
         return experiment
 
-    if schedule in ['train', 'train_and_evaluate']:
+    if is_training:
         print('Training model for {} epochs...'.format(hparams.n_epochs))
-    learn_runner.run(
+    tf.contrib.learn.learn_runner.run(
         experiment_fn=experiment_fn,
         run_config=run_config,
         schedule=schedule,  # What to run, e.g. "train_and_evaluate", "evaluate", ...
-        hparams=hparams  # hyperparameters
-    )
+        hparams=hparams)  # hyperparameters
 
     #input_example = tf.placeholder(dtype=tf.int64, shape=[None, 10])
     #serving_input_receiver_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({WORDS_FEATURE: input_example})

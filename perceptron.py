@@ -1,12 +1,10 @@
-import pickle
-
 import tensorflow as tf
 
 from common import WORDS_FEATURE, tic, toc, create_parser_training, parse_arguments, \
     preprocess_data, run_experiment, estimator_spec_for_softmax_classification
 
+# Default values
 MODEL_DIRECTORY = 'perceptron_model'
-#SPLIT_SEED = 1234
 NUM_EPOCHS = 2
 BATCH_SIZE = 64
 LEARNING_RATE = 0.005
@@ -29,7 +27,7 @@ def bag_of_words_perceptron(features, labels, mode, params):
 
 
 def perceptron(unused_argv):
-    """Trains the perceptron model."""
+    """Train and evaluate the perceptron model."""
     tf.logging.set_verbosity(FLAGS.verbosity)
 
     print("Preprocessing data...")
@@ -40,7 +38,7 @@ def perceptron(unused_argv):
     # Set the output dimension according to the number of classes
     FLAGS.output_dim = len(classes)
 
-    # Train the model.
+    # Train and evaluate the model.
     tic()
     run_experiment(x_train, y_train, x_test, y_test, bag_of_words_perceptron, 'train_and_evaluate', FLAGS)
     toc()
@@ -48,9 +46,7 @@ def perceptron(unused_argv):
 
 # Run script ##############################################
 if __name__ == "__main__":
-    # Get common parser
     parser = create_parser_training(MODEL_DIRECTORY, NUM_EPOCHS, BATCH_SIZE, LEARNING_RATE)
-
     FLAGS = parse_arguments(parser)
 
     tf.app.run(perceptron)

@@ -186,9 +186,9 @@ def get_data(data_directory, classes_only=False):
 def extract_data(train_raw, test_raw):
     """Extract the document and class from each entry in the data."""
     x_train = train_raw[2]
-    y_train = train_raw[0]
+    y_train = train_raw[0] - 1  # Start enumeration at 0 instead of 1
     x_test = test_raw[2]
-    y_test = test_raw[0]
+    y_test = test_raw[0] - 1
     print('Size of training set: {0}'.format(len(x_train)))
     print('Size of test set: {0}'.format(len(x_test)))
     return x_train, np.array(y_train), x_test, np.array(y_test)
@@ -405,8 +405,8 @@ def estimator_spec_for_softmax_classification(logits, labels, mode, params):
                 'class': tf.estimator.export.PredictOutput(predicted_class)
             })
 
-    onehot_labels = tf.one_hot(labels, params.output_dim, 1, 0)
-    loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=logits)
+    #onehot_labels = tf.one_hot(labels, params.output_dim, 1, 0)
+    loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
     if mode == tf.estimator.ModeKeys.TRAIN:
         with tf.name_scope('OptimizeLoss'):
             optimizer = tf.train.AdamOptimizer(learning_rate=params.learning_rate)

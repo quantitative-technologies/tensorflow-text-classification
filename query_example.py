@@ -7,7 +7,7 @@ from rnn import rnn_model
 
 
 def query(argv=None):
-    tf.logging.set_verbosity('warn')
+    tf.logging.set_verbosity(tf.logging.WARN)
 
     classes = get_data(FLAGS.data_dir, classes_only=True)
     FLAGS.output_dim = len(classes)

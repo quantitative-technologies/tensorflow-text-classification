@@ -7,8 +7,10 @@ from rnn import rnn_model
 
 
 def query(argv=None):
-    class_names = get_data(FLAGS.data_dir, classes_only=True)
-    FLAGS.output_dim = len(class_names)
+    tf.logging.set_verbosity('warn')
+
+    classes = get_data(FLAGS.data_dir, classes_only=True)
+    FLAGS.output_dim = len(classes)
 
     QUERIES = [
         'University of Toronto',
@@ -36,7 +38,7 @@ def query(argv=None):
     classifications = predict(x_query, model, FLAGS)
     for i, query in enumerate(QUERIES):
         print('The model classifies "{0}" as a member of the class {1}.'.format(
-            query, class_names['class'][classifications[i] - 1]))
+            query, classes['class'][classifications[i]]))
 
 
 # Run script ##############################################

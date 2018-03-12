@@ -335,10 +335,6 @@ def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags):
         schedule=schedule,  # What to run, e.g. "train_and_evaluate", "evaluate", ...
         hparams=hparams)  # hyperparameters
 
-    #input_example = tf.placeholder(dtype=tf.int64, shape=[None, 10])
-    #serving_input_receiver_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({WORDS_FEATURE: input_example})
-    #estimator.export_savedmodel(flags.model_dir, serving_input_receiver_fn)
-
 
 def predict(x_data, model_fn, flags):
     """Performs classification on the given x_data using the model given by model_fn."""

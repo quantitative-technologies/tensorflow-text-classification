@@ -4,6 +4,7 @@ from common import EMBEDDING_SIZE, WORD_METADATA_FILENAME, SENTENCE_METADATA_FIL
     tic, toc, create_parser_training, parse_arguments, \
     preprocess_data, run_experiment, create_metadata, estimator_spec_for_softmax_classification
 
+# Default values
 MODEL_DIRECTORY = 'rnn_model'
 NUM_EPOCHS = 2
 BATCH_SIZE = 64
@@ -40,7 +41,6 @@ def rnn_model(features, labels, mode, params):
 def rnn_example(unused_argv):
     """Trains a multilayer perceptron with 1 hidden layer. It assumes that the data has already been preprocessed,
     e.g. by perceptron.py"""
-
     tf.logging.set_verbosity(FLAGS.verbosity)
 
     print("Preprocessing data...")
@@ -82,4 +82,4 @@ if __name__ == "__main__":
 
     FLAGS = parse_arguments(parser)
 
-    tf.app.run(rnn_example)
+    rnn_example()

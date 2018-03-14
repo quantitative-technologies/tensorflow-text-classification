@@ -6,13 +6,14 @@ from common import get_data, extract_data, process_vocabulary, run_experiment, t
     create_parser_training, parse_arguments
 from perceptron import bag_of_words_perceptron
 
+# Default values
 MODEL_DIRECTORY = 'perceptron_example_model'
 NUM_EPOCHS = 2
 BATCH_SIZE = 64
 LEARNING_RATE = 0.005
 
 
-def perceptron_example(unused_argv):
+def perceptron_example():
     """Perceptron example demonstrating online learning, and also evaluation separate from training."""
     tf.logging.set_verbosity(FLAGS.verbosity)
 
@@ -70,7 +71,6 @@ def perceptron_example(unused_argv):
 if __name__ == "__main__":
     # Get common parser
     parser = create_parser_training(MODEL_DIRECTORY, NUM_EPOCHS, BATCH_SIZE, LEARNING_RATE)
-
     FLAGS = parse_arguments(parser)
 
-    tf.app.run(perceptron_example)
+    perceptron_example()

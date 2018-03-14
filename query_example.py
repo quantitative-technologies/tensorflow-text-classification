@@ -6,7 +6,8 @@ from mlp import bag_of_words_multilayer_perceptron
 from rnn import rnn_model
 
 
-def query(argv=None):
+def query():
+    """Perform inference on some examples of documents from our classes."""
     tf.logging.set_verbosity(tf.logging.WARN)
 
     classes = get_data(FLAGS.data_dir, classes_only=True)
@@ -44,7 +45,6 @@ def query(argv=None):
 # Run script ##############################################
 if __name__ == "__main__":
     parser = create_parser()
-
     parser.add_argument(
         '--embed-dim',
         type=int,
@@ -57,7 +57,6 @@ if __name__ == "__main__":
     parser.add_argument(
         'model',
         help='Which model, e.g. perceptron, mlp, etc...')
-
     FLAGS = parser.parse_args()
 
     query()

@@ -7,6 +7,7 @@ from common import EMBEDDING_SIZE, WORD_METADATA_FILENAME, SENTENCE_METADATA_FIL
     tic, toc, create_parser_training, parse_arguments, \
     preprocess_data, run_experiment, create_metadata, estimator_spec_for_softmax_classification
 
+# Default values
 MODEL_DIRECTORY = 'mlp_model'
 NUM_EPOCHS = 2
 BATCH_SIZE = 64
@@ -44,7 +45,6 @@ def bag_of_words_multilayer_perceptron(features, labels, mode, params):
 
 def mlp_example(unused_argv):
     """Trains a multilayer perceptron with 1 hidden layer."""
-
     tf.logging.set_verbosity(FLAGS.verbosity)
 
     print("Preprocessing data...")
@@ -86,4 +86,4 @@ if __name__ == "__main__":
 
     FLAGS = parse_arguments(parser)
 
-    tf.app.run(mlp_example)
+    mlp_example()

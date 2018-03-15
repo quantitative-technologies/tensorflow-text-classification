@@ -68,7 +68,8 @@ def perceptron_example():
                    bag_of_words_perceptron, 'train_and_evaluate', FLAGS)
     toc()
 
-    # We may be interested in the model performance on the training data (e.g. to evaluate removable bias).
+    # We may be interested in the model performance on the training data
+    # (e.g. to evaluate removable bias).
     print("\nEvaluation of the model performance on the training data.:")
     run_experiment(None, None, x_train1, y_train1,
                    bag_of_words_perceptron, 'evaluate', FLAGS)

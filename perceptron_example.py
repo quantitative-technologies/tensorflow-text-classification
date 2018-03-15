@@ -10,7 +10,7 @@ from perceptron import bag_of_words_perceptron
 MODEL_DIRECTORY = 'perceptron_example_model'
 NUM_EPOCHS = 2
 BATCH_SIZE = 64
-LEARNING_RATE = 0.005
+LEARNING_RATE = 0.05
 
 
 def perceptron_example():

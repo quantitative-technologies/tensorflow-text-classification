@@ -17,7 +17,7 @@ def query():
     classes = get_data(FLAGS.data_dir, classes_only=True)
     FLAGS.output_dim = len(classes)
 
-    queries = np.loadtxt('queries.txt', dtype=str, delimiter='\n')
+    queries = np.loadtxt(FLAGS.query_file, dtype=str, delimiter='\n')
     _, x_query, _, _ = process_vocabulary(None, queries, FLAGS, reuse=True)
 
     if FLAGS.model == 'perceptron':

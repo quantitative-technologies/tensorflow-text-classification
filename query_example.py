@@ -1,9 +1,13 @@
+import pandas as pd
 import tensorflow as tf
 
 from common import EMBEDDING_SIZE, create_parser, get_data, process_vocabulary, predict
 from perceptron import bag_of_words_perceptron
 from mlp import bag_of_words_multilayer_perceptron
 from rnn import rnn_model
+
+# Default values
+QUERY_FILENAME = 'queries.txt'
 
 
 def query():
@@ -13,19 +17,8 @@ def query():
     classes = get_data(FLAGS.data_dir, classes_only=True)
     FLAGS.output_dim = len(classes)
 
-    QUERIES = [
-        'University of Toronto',
-        'TTC: Toronto Transit Commission, run buses, streetcars and subways',
-        'Dragon',
-        'Harley Davidson',
-        'A kitten is a baby cat.',
-        'Dog sleds are sleds pulled by a number of dogs on harnesses. They were used by the Eskimos.',
-        'Bering Strait',
-        'Whitehorse, Yukon',
-        'Marijuana, also called hemp or cannabis',
-        'Bat Out of Hell by Meat Loaf'
-        ]
-    _, x_query, _, _ = process_vocabulary(None, QUERIES, FLAGS, reuse=True)
+    queries = pd.read_csv(FLAGS.query_file, header=None, names=['query'])
+    _, x_query, _, _ = process_vocabulary(None, queries, FLAGS, reuse=True)
 
     if FLAGS.model == 'perceptron':
         model = bag_of_words_perceptron
@@ -37,8 +30,8 @@ def query():
         raise ValueError('unknown model')
 
     classifications = predict(x_query, model, FLAGS)
-    for i, query in enumerate(QUERIES):
-        print('The model classifies "{0}" as a member of the class {1}.'.format(
+    for i, query in enumerate(queries):
+        print('The model classifies "{}" as a member of the class {}.'.format(
             query, classes['class'][classifications[i]]))
 
 
@@ -57,6 +50,10 @@ if __name__ == "__main__":
     parser.add_argument(
         'model',
         help='Which model, e.g. perceptron, mlp, etc...')
+    parser.add_argument(
+        '--query-file',
+        default=QUERY_FILENAME,
+        help='Name of the queries file (default: {})'.format(QUERY_FILENAME))
     FLAGS = parser.parse_args()
 
     query()

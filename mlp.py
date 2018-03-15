@@ -3,7 +3,7 @@ from os import path, getcwd
 import tensorflow as tf
 from tensorflow.contrib.tensorboard.plugins import projector
 
-from common import EMBEDDING_SIZE, WORD_METADATA_FILENAME, SENTENCE_METADATA_FILENAME, WORDS_FEATURE, \
+from common import EMBEDDING_DIM, WORD_METADATA_FILENAME, SENTENCE_METADATA_FILENAME, WORDS_FEATURE, \
     tic, toc, create_parser_training, parse_arguments, \
     preprocess_data, run_experiment, create_metadata, estimator_spec_for_softmax_classification
 
@@ -72,9 +72,9 @@ if __name__ == "__main__":
     parser.add_argument(
         '--embed-dim',
         type=int,
-        default=EMBEDDING_SIZE,
+        default=EMBEDDING_DIM,
         help='Number of dimensions in the embedding, '
-             'i.e. the number of nodes in the hidden embedding layer (default: {})'.format(EMBEDDING_SIZE))
+             'i.e. the number of nodes in the hidden embedding layer (default: {})'.format(EMBEDDING_DIM))
     parser.add_argument(
         '--word-meta-file',
         default=WORD_METADATA_FILENAME,

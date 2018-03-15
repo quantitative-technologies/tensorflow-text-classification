@@ -100,7 +100,7 @@ def create_parser_training(model_dir=None, n_epochs=None, batch_size=None, learn
     parser.add_argument(
         '--verbosity',
         default=VERBOSITY,
-        help='Tensorflow verbosity: debug, info, warning or error (default: {})'.format(VERBOSITY))
+        help='Tensorflow verbosity: debug, info, warn or error (default: {})'.format(VERBOSITY))
     parser.add_argument(
         '--tf-seed',
         type=int,
@@ -124,7 +124,7 @@ def parse_arguments(parser):
         flags.verbosity = tf.logging.DEBUG
     elif verbosity == 'info':
         flags.verbosity = tf.logging.INFO
-    elif verbosity == 'warning':
+    elif verbosity == 'warn':
         flags.verbosity = tf.logging.WARN
     elif verbosity == 'error':
         flags.verbosity = tf.logging.ERROR
@@ -334,10 +334,6 @@ def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags):
         run_config=run_config,
         schedule=schedule,  # What to run, e.g. "train_and_evaluate", "evaluate", ...
         hparams=hparams)  # hyperparameters
-
-    #input_example = tf.placeholder(dtype=tf.int64, shape=[None, 10])
-    #serving_input_receiver_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({WORDS_FEATURE: input_example})
-    #estimator.export_savedmodel(flags.model_dir, serving_input_receiver_fn)
 
 
 def predict(x_data, model_fn, flags):

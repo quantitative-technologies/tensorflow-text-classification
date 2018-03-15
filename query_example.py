@@ -1,7 +1,7 @@
-import pandas as pd
+import numpy as np
 import tensorflow as tf
 
-from common import EMBEDDING_SIZE, create_parser, get_data, process_vocabulary, predict
+from common import EMBEDDING_DIM, create_parser, get_data, process_vocabulary, predict
 from perceptron import bag_of_words_perceptron
 from mlp import bag_of_words_multilayer_perceptron
 from rnn import rnn_model
@@ -17,7 +17,7 @@ def query():
     classes = get_data(FLAGS.data_dir, classes_only=True)
     FLAGS.output_dim = len(classes)
 
-    queries = pd.read_csv(FLAGS.query_file, header=None, names=['query'])
+    queries = np.loadtxt('queries.txt', dtype=str, delimiter='\n')
     _, x_query, _, _ = process_vocabulary(None, queries, FLAGS, reuse=True)
 
     if FLAGS.model == 'perceptron':
@@ -41,9 +41,9 @@ if __name__ == "__main__":
     parser.add_argument(
         '--embed-dim',
         type=int,
-        default=EMBEDDING_SIZE,
+        default=EMBEDDING_DIM,
         help='Number of dimensions in the embedding, '
-             'i.e. the number of nodes in the hidden embedding layer (default: {})'.format(EMBEDDING_SIZE))
+             'i.e. the number of nodes in the hidden embedding layer (default: {})'.format(EMBEDDING_DIM))
     parser.add_argument(
         'model_dir',
         help='The directory of the trained model')

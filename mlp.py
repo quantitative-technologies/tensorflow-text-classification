@@ -43,7 +43,7 @@ def bag_of_words_multilayer_perceptron(features, labels, mode, params):
     return estimator_spec_for_softmax_classification(logits, labels, mode, params)
 
 
-def mlp_example(unused_argv):
+def mlp():
     """Trains a multilayer perceptron with 1 hidden layer."""
     tf.logging.set_verbosity(FLAGS.verbosity)
 
@@ -86,4 +86,4 @@ if __name__ == "__main__":
 
     FLAGS = parse_arguments(parser)
 
-    mlp_example()
+    mlp()

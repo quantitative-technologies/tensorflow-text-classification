@@ -262,8 +262,17 @@ def preprocess_data(flags):
         x_train, x_test, _, _ = process_vocabulary(train_sentences, test_sentences, flags)
 
         # Save the processed data to avoid re-processing.
+        saved = False
         with open(preprocessed_path, 'wb') as f:
-            pickle.dump([train_raw, x_train, y_train, x_test, y_test, classes], f)
+            try:
+                pickle.dump([train_raw, x_train, y_train, x_test, y_test, classes], f)
+                saved = True
+            except OverflowError:
+                # Can happen if max-doc-len is large.
+                pass
+
+        if not saved:
+            remove(preprocessed_path)
 
     return train_raw, x_train, y_train, x_test, y_test, classes
 

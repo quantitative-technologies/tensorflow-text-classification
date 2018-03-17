@@ -259,7 +259,7 @@ def preprocess_data(flags):
         train_raw = shuffle(train_raw)
         test_raw = shuffle(test_raw)
         train_sentences, y_train, test_sentences, y_test = extract_data(train_raw, test_raw)
-        x_train, x_test, _, _ = process_vocabulary(train_sentences, test_sentences, flags)
+        x_train, x_test, _, _ = process_vocabulary(train_sentences, test_sentences, flags, reuse=True)
 
         # Save the processed data to avoid re-processing.
         saved = False

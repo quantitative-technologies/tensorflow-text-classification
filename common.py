@@ -250,6 +250,7 @@ def preprocess_data(flags):
         with open(preprocessed_path, 'rb') as f:
             train_raw, x_train, y_train, x_test, y_test, classes = pickle.load(f)
     else:
+        # Get the raw data, downloading it if necessary.
         train_raw, test_raw, classes = get_data(flags.data_dir)
 
         # Seeding is necessary for reproducibility.
@@ -259,6 +260,7 @@ def preprocess_data(flags):
         train_raw = shuffle(train_raw)
         test_raw = shuffle(test_raw)
         train_sentences, y_train, test_sentences, y_test = extract_data(train_raw, test_raw)
+        # Encode the raw data as integer vectors.
         x_train, x_test, _, _ = process_vocabulary(train_sentences, test_sentences, flags, reuse=True)
 
         # Save the processed data to avoid re-processing.

@@ -1,6 +1,10 @@
-import tensorflow as tf
+from os import path, getcwd
 
-from common import WORDS_FEATURE, tic, toc, create_parser_training, parse_arguments, \
+import tensorflow as tf
+from tensorflow.contrib.tensorboard.plugins import projector
+
+from common import WORD_METADATA_FILENAME, SENTENCE_METADATA_FILENAME, WORDS_FEATURE, \
+    tic, toc, create_parser_training, parse_arguments, \
     preprocess_data, run_experiment, estimator_spec_for_softmax_classification
 
 # Default values
@@ -10,7 +14,7 @@ BATCH_SIZE = 64
 LEARNING_RATE = 0.05
 
 
-def bag_of_words_perceptron_feature_columns(features, labels, mode, params):
+def bag_of_words_perceptron_model(features, labels, mode, params):
     """Perceptron architecture"""
     with tf.variable_scope('Perceptron'):
         bow_column = tf.feature_column.categorical_column_with_identity(
@@ -26,16 +30,7 @@ def bag_of_words_perceptron_feature_columns(features, labels, mode, params):
     return estimator_spec_for_softmax_classification(logits, labels, mode, params)
 
 
-def bag_of_words_perceptron(features, labels, mode, params):
-    """Perceptron architecture"""
-    with tf.variable_scope('Perceptron'):
-        logits = tf.contrib.layers.bow_encoder(
-            features[WORDS_FEATURE], vocab_size=params.n_words, embed_dim=params.output_dim)
-
-    return estimator_spec_for_softmax_classification(logits, labels, mode, params)
-
-
-def perceptron(unused_argv):
+def perceptron():
     """Train and evaluate the perceptron model."""
     tf.logging.set_verbosity(FLAGS.verbosity)
 
@@ -49,13 +44,22 @@ def perceptron(unused_argv):
 
     # Train and evaluate the model.
     tic()
-    run_experiment(x_train, y_train, x_test, y_test, bag_of_words_perceptron_feature_columns, 'train_and_evaluate', FLAGS)
+    run_experiment(x_train, y_train, x_test, y_test, bag_of_words_perceptron_model, 'train_and_evaluate', FLAGS)
     toc()
 
 
 # Run script ##############################################
 if __name__ == "__main__":
     parser = create_parser_training(MODEL_DIRECTORY, NUM_EPOCHS, BATCH_SIZE, LEARNING_RATE)
+    parser.add_argument(
+        '--word-meta-file',
+        default=WORD_METADATA_FILENAME,
+        help='Word embedding metadata filename (default: {})'.format(WORD_METADATA_FILENAME))
+    parser.add_argument(
+        '--sent-meta-file',
+        default=SENTENCE_METADATA_FILENAME,
+        help='Sentence embedding metadata filename (default: {})'.format(SENTENCE_METADATA_FILENAME))
+
     FLAGS = parse_arguments(parser)
 
-    tf.app.run(perceptron)
+    perceptron()

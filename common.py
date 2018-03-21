@@ -229,7 +229,7 @@ def process_vocabulary(train_sentences, test_sentences, flags, reuse=True, vocab
         test_bow = np.array(list(vocabulary_processor.transform(test_sentences)))
     else:
         test_bow = None
-    n_words = len(vocabulary_processor.vocabulary_)
+x    n_words = len(vocabulary_processor.vocabulary_)
     print('Number of words in vocabulary: %d' % n_words)
 
     if save_vocab_processor:

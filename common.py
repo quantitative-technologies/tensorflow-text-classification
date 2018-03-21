@@ -241,9 +241,9 @@ def process_vocabulary(train_sentences, test_sentences, flags, reuse=True, vocab
 
 
 def preprocess_data(flags):
-    """Load data, shuffle it, process the vocabulary and save to DATA_FILENAME, if not done already. Returns saved data.
-       NOTE: If the max_doc_len changes from a previous run, then DATA_FILENAME should be deleted so that it can be
-       properly recreated."""
+    """Load data, shuffle it, process the vocabulary and save to DATA_FILENAME, if not done already.
+       Returns processed data. NOTE: If the max_doc_len changes from a previous run,
+       then DATA_FILENAME should be deleted so that it can be properly recreated."""
 
     preprocessed_path = path.join(flags.model_dir, DATA_FILENAME)
     if path.isfile(preprocessed_path):

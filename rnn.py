@@ -38,7 +38,7 @@ def rnn_model(features, labels, mode, params):
     return estimator_spec_for_softmax_classification(logits, labels, mode, params)
 
 
-def rnn_example(unused_argv):
+def rnn():
     """Trains a multilayer perceptron with 1 hidden layer. It assumes that the data has already been preprocessed,
     e.g. by perceptron.py"""
     tf.logging.set_verbosity(FLAGS.verbosity)
@@ -82,4 +82,4 @@ if __name__ == "__main__":
 
     FLAGS = parse_arguments(parser)
 
-    rnn_example()
+    rnn()

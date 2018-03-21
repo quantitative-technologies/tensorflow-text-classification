@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from common import EMBEDDING_DIM, create_parser, get_data, process_vocabulary, predict
-from perceptron import bag_of_words_perceptron
+from perceptron import bag_of_words_perceptron_model
 from mlp import bag_of_words_multilayer_perceptron
 from rnn import rnn_model
 
@@ -21,7 +21,7 @@ def query():
     _, x_query, _, _ = process_vocabulary(None, queries, FLAGS, reuse=True)
 
     if FLAGS.model == 'perceptron':
-        model = bag_of_words_perceptron
+        model = bag_of_words_perceptron_model
     elif FLAGS.model == 'mlp':
         model = bag_of_words_multilayer_perceptron
     elif FLAGS.model == 'rnn':

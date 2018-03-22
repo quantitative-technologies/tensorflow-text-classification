@@ -11,10 +11,10 @@ from common import EMBEDDING_DIM, WORD_METADATA_FILENAME, SENTENCE_METADATA_FILE
 MODEL_DIRECTORY = 'mlp_model'
 NUM_EPOCHS = 2
 BATCH_SIZE = 64
-LEARNING_RATE = 0.002
+LEARNING_RATE = 0.005
 
 
-def bag_of_words_multilayer_perceptron(features, labels, mode, params):
+def bag_of_words_MLP_model(features, labels, mode, params):
     """MLP architecture"""
     with tf.variable_scope('MLP'):
         bow_column = tf.feature_column.categorical_column_with_identity(
@@ -24,21 +24,8 @@ def bag_of_words_multilayer_perceptron(features, labels, mode, params):
         bow = tf.feature_column.input_layer(
             features,
             feature_columns=[bow_embedding_column])
-        bow_active = tf.nn.relu(bow)
-        logits = tf.layers.dense(bow_active, params.output_dim, activation=None)
-
-        if mode == tf.estimator.ModeKeys.TRAIN:
-            # Create output for the TensorBoard Projector
-            config = projector.ProjectorConfig()
-            word_embedding = config.embeddings.add()
-            #sentence_embedding = config.embeddings.add()
-            # The name of the embedding tensor was discovered by using TensorBoard.
-            word_embedding.tensor_name = 'MLP/input_layer/words_embedding/embedding_weights'
-            word_embedding.metadata_path = path.join(getcwd(), FLAGS.word_meta_file)
-            #sentence_embedding.tensor_name = bow.name
-            #sentence_embedding.metadata_path = path.join(getcwd(), FLAGS.sent_meta_file)
-            writer = tf.summary.FileWriter(FLAGS.model_dir)
-            projector.visualize_embeddings(writer, config)
+        bow_activated = tf.nn.relu(bow)
+        logits = tf.layers.dense(bow_activated, params.output_dim, activation=None)
 
     return estimator_spec_for_softmax_classification(logits, labels, mode, params)
 
@@ -57,8 +44,17 @@ def mlp():
 
     # Train the MLP model.
     tic()
-    run_experiment(x_train, y_train, x_test, y_test, bag_of_words_multilayer_perceptron, 'train_and_evaluate', FLAGS)
+    run_experiment(x_train, y_train, x_test, y_test, bag_of_words_MLP_model, 'train_and_evaluate', FLAGS)
     toc()
+
+    # Create output for the TensorBoard Projector
+    config = projector.ProjectorConfig()
+    word_embedding = config.embeddings.add()
+    # The name of the embedding tensor was discovered by using TensorBoard.
+    word_embedding.tensor_name = 'MLP/input_layer/words_embedding/embedding_weights'
+    word_embedding.metadata_path = path.join(getcwd(), FLAGS.word_meta_file)
+    writer = tf.summary.FileWriter(FLAGS.model_dir)
+    projector.visualize_embeddings(writer, config)
 
     # Create metadata for TensorBoard Projector.
     create_metadata(train_raw, classes, FLAGS)

@@ -3,7 +3,7 @@ import tensorflow as tf
 
 from common import EMBEDDING_DIM, create_parser, get_data, process_vocabulary, predict
 from perceptron import bag_of_words_perceptron_model
-from mlp import bag_of_words_multilayer_perceptron
+from mlp import bag_of_words_MLP_model
 from rnn import rnn_model
 
 # Default values
@@ -23,7 +23,7 @@ def query():
     if FLAGS.model == 'perceptron':
         model = bag_of_words_perceptron_model
     elif FLAGS.model == 'mlp':
-        model = bag_of_words_multilayer_perceptron
+        model = bag_of_words_MLP_model
     elif FLAGS.model == 'rnn':
         model = rnn_model
     else:

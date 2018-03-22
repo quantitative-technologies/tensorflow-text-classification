@@ -44,7 +44,8 @@ def mlp():
 
     # Train the MLP model.
     tic()
-    run_experiment(x_train, y_train, x_test, y_test, bag_of_words_MLP_model, 'train_and_evaluate', FLAGS)
+    run_experiment(x_train, y_train, x_test, y_test,
+                   bag_of_words_MLP_model, 'train_and_evaluate', FLAGS)
     toc()
 
     # Create output for the TensorBoard Projector

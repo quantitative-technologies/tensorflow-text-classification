@@ -356,13 +356,17 @@ def predict(x_data, model_fn, flags):
         embed_dim=flags.embed_dim
     )
 
+    # Compute path to a specific checkpoint if given
+    chkpt_path = path.join(flags.model_dir, 'model.ckpt-' + str(flags.checkpoint)) \
+        if flags.checkpoint else None
+
     run_config = tf.contrib.learn.RunConfig()
     run_config = run_config.replace(model_dir=flags.model_dir)
     predictions = tf.estimator.Estimator(
         model_fn=model_fn,
         config=run_config,
         params=hparams
-    ).predict(input_fn(x_data, num_epochs=1))
+    ).predict(input_fn(x_data, num_epochs=1), checkpoint_path=chkpt_path)
     return [p['class'] for p in predictions]
 
 

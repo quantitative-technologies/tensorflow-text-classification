@@ -54,6 +54,11 @@ if __name__ == "__main__":
         '--query-file',
         default=QUERY_FILENAME,
         help='Name of the queries file (default: {})'.format(QUERY_FILENAME))
+    parser.add_argument(
+        '--checkpoint',
+        type=int,
+        default=None,
+        help='Model checkpoint to query. By default the most recent model is used.')
     FLAGS = parse_arguments(parser)
 
     query()

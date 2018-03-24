@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-from common import EMBEDDING_DIM, create_parser, get_data, process_vocabulary, predict
+from common import EMBEDDING_DIM, create_parser, parse_arguments, get_data, process_vocabulary, predict
 from perceptron import bag_of_words_perceptron_model
 from mlp import bag_of_words_MLP_model
 from rnn import rnn_model
@@ -12,7 +12,7 @@ QUERY_FILENAME = 'queries.txt'
 
 def query():
     """Perform inference on some examples of documents from our classes."""
-    tf.logging.set_verbosity(tf.logging.WARN)
+    tf.logging.set_verbosity(FLAGS.verbosity)
 
     classes = get_data(FLAGS.data_dir, classes_only=True)
     FLAGS.output_dim = len(classes)
@@ -54,6 +54,6 @@ if __name__ == "__main__":
         '--query-file',
         default=QUERY_FILENAME,
         help='Name of the queries file (default: {})'.format(QUERY_FILENAME))
-    FLAGS = parser.parse_args()
+    FLAGS = parse_arguments(parser)
 
     query()

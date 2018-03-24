@@ -11,7 +11,7 @@ from sklearn.utils import shuffle
 DATA_DIRECTORY = 'data'
 MAX_DOCUMENT_LENGTH = 10
 MAX_VOCABULARY_SIZE = 1000000
-EMBEDDING_DIM = 15
+EMBEDDING_DIM = 25
 TF_SEED = 4242
 NP_SEED = 1234
 CHECKPOINTS_PER_EPOCH = 5
@@ -66,6 +66,10 @@ def create_parser(model_dir=None):
         type=int,
         default=MAX_VOCABULARY_SIZE,
         help='Discard any new vocabulary beyond this (default: {})'.format(MAX_VOCABULARY_SIZE))
+    parser.add_argument(
+        '--verbosity',
+        default=VERBOSITY,
+        help='Tensorflow verbosity: debug, info, warn or error (default: {})'.format(VERBOSITY))
 
     return parser
 
@@ -98,10 +102,6 @@ def create_parser_training(model_dir=None, n_epochs=None, batch_size=None, learn
         default=CHECKPOINTS_PER_EPOCH,
         help='Number of checkpoints per training epoch (default: {})'.format(CHECKPOINTS_PER_EPOCH))
     parser.add_argument(
-        '--verbosity',
-        default=VERBOSITY,
-        help='Tensorflow verbosity: debug, info, warn or error (default: {})'.format(VERBOSITY))
-    parser.add_argument(
         '--tf-seed',
         type=int,
         default=TF_SEED,
@@ -131,10 +131,11 @@ def parse_arguments(parser):
     else:
         raise ValueError('Invalid verbosity argument.')
 
-    if flags.batch_size == 'None':
-        flags.batch_size = None
-    else:
-        flags.batch_size = int(flags.batch_size)
+    if hasattr(flags, 'batch_size'):
+        if flags.batch_size == 'None':
+            flags.batch_size = None
+        else:
+            flags.batch_size = int(flags.batch_size)
 
     return flags
 

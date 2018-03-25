@@ -42,19 +42,20 @@ def mlp():
     # Set the output dimension according to the number of classes
     FLAGS.output_dim = len(classes)
 
-    # Train the MLP model.
+    # Train and evaluate the MLP model.
     tic()
     run_experiment(x_train, y_train, x_test, y_test,
                    bag_of_words_MLP_model, 'train_and_evaluate', FLAGS)
     toc()
 
-    # Create output for the TensorBoard Projector
+    # Associate metadata with the word embedding for TensorBoard Projector
     config = projector.ProjectorConfig()
     word_embedding = config.embeddings.add()
     # The name of the embedding tensor was discovered by using TensorBoard.
     word_embedding.tensor_name = 'MLP/input_layer/words_embedding/embedding_weights'
     word_embedding.metadata_path = path.join(getcwd(), FLAGS.word_meta_file)
     writer = tf.summary.FileWriter(FLAGS.model_dir)
+    # Writes projector_config.pbtxt
     projector.visualize_embeddings(writer, config)
 
     # Create metadata for TensorBoard Projector.

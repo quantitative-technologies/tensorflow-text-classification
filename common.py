@@ -270,7 +270,7 @@ def preprocess_data(flags):
             try:
                 pickle.dump([train_raw, x_train, y_train, x_test, y_test, classes], f)
                 saved = True
-            except OverflowError:
+            except (OverflowError, MemoryError):
                 # Can happen if max-doc-len is large.
                 pass
 
@@ -396,9 +396,7 @@ def create_metadata(train_raw, classes, flags):
             f.write("Label\tTitle\tDocument\n")
             for row in train_raw.itertuples():
                 label = classes.iloc[row[1] - 1].item()
-                # title = tf.compat.as_text(row[2]).encode('utf-8')
                 title = row[2]
-                # sent = tf.compat.as_text(row[3]).encode('utf-8')
                 sent = row[3]
                 f.write("%s\t%s\t%s\n" % (label, title, sent))
 

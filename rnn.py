@@ -13,7 +13,7 @@ LEARNING_RATE = 0.002
 
 def rnn_model(features, labels, mode, params):
     """RNN model architecture using GRUs."""
-    with tf.variable.scope('RNN'):
+    with tf.variable_scope('RNN'):
         # This creates an embedding matrix of dimension (params.n_words, params.embed_dim).
         # Thus an integer input matrix of size (num_docs, max_doc_len) will get mapped
         # to a tensor of dimension (num_docs, max_doc_len, params.embed_dim).
@@ -28,8 +28,14 @@ def rnn_model(features, labels, mode, params):
         # Create a Gated Recurrent Unit cell with hidden layer size params.embed_dim.
         cell = tf.nn.rnn_cell.GRUCell(params.embed_dim)
 
-        # Create an unrolled Recurrent Neural Networks of length params.max_doc_len.
-        _, encoding = tf.nn.static_rnn(cell, word_sequence, dtype=tf.float32)
+        # Create an unrolled Recurrent Neural Networks of length params.max_doc_len,
+        # providing the length of each sequence (i.e. number of words in each document)
+        # so that the output from the last element get propagated to the output layer.
+        if True:
+            _, encoding = tf.nn.static_rnn(cell, word_sequence, dtype=tf.float32,
+                                           sequence_length=features['LENGTHS_FEATURE'])
+        else:
+            _, encoding = tf.nn.static_rnn(cell, word_sequence, dtype=tf.float32)
 
         # The output layer
         logits = tf.layers.dense(encoding, params.output_dim, activation=None)
@@ -44,7 +50,8 @@ def rnn():
 
     print("Preprocessing data...")
     tic()
-    train_raw, x_train, y_train, x_test, y_test, classes = preprocess_data(FLAGS)
+    train_raw, x_train, y_train, x_test, y_test, train_lengths, test_lengths, classes \
+        = preprocess_data(FLAGS, sequence_lengths=True)
     toc()
 
     # Set the output dimension according to the number of classes
@@ -52,7 +59,7 @@ def rnn():
 
     # Train the RNN model.
     tic()
-    run_experiment(x_train, y_train, x_test, y_test, rnn_model, 'train_and_evaluate', FLAGS)
+    run_experiment(x_train, y_train, x_test, y_test, rnn_model, 'train_and_evaluate', FLAGS, train_lengths, test_lengths)
     toc()
 
     # Create metadata for TensorBoard Projector.

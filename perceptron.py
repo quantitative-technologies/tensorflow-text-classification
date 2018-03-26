@@ -36,7 +36,7 @@ def perceptron():
 
     print("Preprocessing data...")
     tic()
-    train_raw, x_train, y_train, x_test, y_test, classes = preprocess_data(FLAGS)
+    train_raw, x_train, y_train, x_test, y_test, _, _, classes = preprocess_data(FLAGS)
     toc()
 
     # Set the output dimension according to the number of classes

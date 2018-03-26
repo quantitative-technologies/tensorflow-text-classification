@@ -21,6 +21,7 @@ VOCAB_PROCESSOR_FILENAME = 'vocab_processor.pickle'
 DATA_FILENAME = 'data.pickle'
 VERBOSITY = 'info'
 WORDS_FEATURE = 'words'  # Name of the input words feature.
+LENGTHS_FEATURE = 'lengths'  # Name of the document lengths feature (not used for BOW)
 
 
 """
@@ -195,7 +196,8 @@ def extract_data(train_raw, test_raw):
     return x_train, np.array(y_train), x_test, np.array(y_test)
 
 
-def process_vocabulary(train_sentences, test_sentences, flags, reuse=True, vocabulary_processor=None, extend=False):
+def process_vocabulary(train_sentences, test_sentences, flags,
+                       reuse=True, vocabulary_processor=None, extend=False, sequence_lengths=False):
     """Map words to integers, and then map sentences to integer sequences of length flags.max_doc_len, by truncating and
        padding as needed. This leads to an integer matrix of data which is what TensorFlow can work with. The processor
        is then saved to disk in a file determined by flags.
@@ -204,6 +206,7 @@ def process_vocabulary(train_sentences, test_sentences, flags, reuse=True, vocab
        reuse: if True load the vocabulary_processor is loaded from disk if the file exists.
        vocabulary_processor: if not None, and it was not loaded from disk, the passed vocabulary_processor is used.
        extend: if True the vocabulary processor (loaded or passed) is extended.
+       sequence_lengths: Whether to list the length of each document.
     """
 
     vocabulary_processor_path = path.join(flags.model_dir, flags.vocab_processor_file)
@@ -238,10 +241,18 @@ def process_vocabulary(train_sentences, test_sentences, flags, reuse=True, vocab
             makedirs(flags.model_dir)
         vocabulary_processor.save(vocabulary_processor_path)
 
-    return train_bow, test_bow, vocabulary_processor, n_words
+    if sequence_lengths:
+        def calculate_lengths(arr):
+            return arr.shape[1] - (arr != 0)[:, ::-1].argmax(axis=1)
+        train_lengths = calculate_lengths(train_bow)
+        test_lengths = calculate_lengths(test_bow)
+    else:
+        train_lengths = test_lengths = None
+
+    return train_bow, test_bow, train_lengths, test_lengths, vocabulary_processor, n_words
 
 
-def preprocess_data(flags):
+def preprocess_data(flags, sequence_lengths=False):
     """Load data, shuffle it, process the vocabulary and save to DATA_FILENAME, if not done already.
        Returns processed data. NOTE: If the max_doc_len changes from a previous run,
        then DATA_FILENAME should be deleted so that it can be properly recreated."""
@@ -249,7 +260,7 @@ def preprocess_data(flags):
     preprocessed_path = path.join(flags.model_dir, DATA_FILENAME)
     if path.isfile(preprocessed_path):
         with open(preprocessed_path, 'rb') as f:
-            train_raw, x_train, y_train, x_test, y_test, classes = pickle.load(f)
+            train_raw, x_train, y_train, x_test, y_test, train_lengths, test_lengths, classes = pickle.load(f)
     else:
         # Get the raw data, downloading it if necessary.
         train_raw, test_raw, classes = get_data(flags.data_dir)
@@ -262,13 +273,15 @@ def preprocess_data(flags):
         test_raw = shuffle(test_raw)
         train_sentences, y_train, test_sentences, y_test = extract_data(train_raw, test_raw)
         # Encode the raw data as integer vectors.
-        x_train, x_test, _, _ = process_vocabulary(train_sentences, test_sentences, flags, reuse=True)
+        x_train, x_test, train_lengths, test_lengths, _, _ = process_vocabulary(train_sentences, test_sentences, flags,
+                                                                                reuse=True,
+                                                                                sequence_lengths=sequence_lengths)
 
         # Save the processed data to avoid re-processing.
         saved = False
         with open(preprocessed_path, 'wb') as f:
             try:
-                pickle.dump([train_raw, x_train, y_train, x_test, y_test, classes], f)
+                pickle.dump([train_raw, x_train, y_train, x_test, y_test, train_lengths, test_lengths, classes], f)
                 saved = True
             except (OverflowError, MemoryError):
                 # Can happen if max-doc-len is large.
@@ -277,7 +290,7 @@ def preprocess_data(flags):
         if not saved:
             remove(preprocessed_path)
 
-    return train_raw, x_train, y_train, x_test, y_test, classes
+    return train_raw, x_train, y_train, x_test, y_test, train_lengths, test_lengths, classes
 
 
 """
@@ -285,19 +298,22 @@ Modelling: Training, evaluation and prediction. Also metadata for TensorBoard.
 """
 
 
-def input_fn(x, y=None, batch_size=None, num_epochs=None, shuffle=False):
+def input_fn(x, y=None, lengths=None, batch_size=None, num_epochs=None, shuffle=False):
     """Generic input function to be used as the input_fn arguments for Experiment or directly with Estimators."""
     if batch_size is None and x is not None:
         batch_size = len(x)
+    x_dict = {WORDS_FEATURE: x}
+    if lengths is not None:
+        x_dict['LENGTHS_FEATURE'] = lengths
     return tf.estimator.inputs.numpy_input_fn(
-        {WORDS_FEATURE: x},
+        x_dict,
         y,
         batch_size=batch_size,
         num_epochs=num_epochs,
         shuffle=shuffle)
 
 
-def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags):
+def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags, train_lengths=None, dev_lengths=None):
     """Create experiment object and run it."""
     hparams = tf.contrib.training.HParams(
         n_words=flags.max_vocab_size,
@@ -330,11 +346,11 @@ def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags):
             params=hparams)
         experiment = tf.contrib.learn.Experiment(
             estimator=estimator,
-            train_input_fn=input_fn(x_train, y_train,
+            train_input_fn=input_fn(x_train, y_train, train_lengths,
                                     batch_size=hparams.batch_size,
                                     num_epochs=hparams.n_epochs,
                                     shuffle=True),
-            eval_input_fn=input_fn(x_dev, y_dev,
+            eval_input_fn=input_fn(x_dev, y_dev, dev_lengths,
                                    num_epochs=1),
             eval_delay_secs=0)
         return experiment

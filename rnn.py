@@ -12,29 +12,28 @@ LEARNING_RATE = 0.002
 
 
 def rnn_model(features, labels, mode, params):
-    """RNN model to predict from sequence of words to a class."""
-    # Convert indexes of words into embeddings.
-    # This creates embeddings matrix of [n_words, EMBEDDING_SIZE] and then
-    # maps word indexes of the sequence into [batch_size, sequence_length,
-    # EMBEDDING_SIZE].
-    word_vectors = tf.contrib.layers.embed_sequence(
-        features[WORDS_FEATURE], vocab_size=params.n_words, embed_dim=params.embed_dim)
+    """RNN model architecture using GRUs."""
+    with tf.variable.scope('RNN'):
+        # This creates an embedding matrix of dimension (params.n_words, params.embed_dim).
+        # Thus an integer input matrix of size (num_docs, max_doc_len) will get mapped
+        # to a tensor of dimension (num_docs, max_doc_len, params.embed_dim).
+        word_vectors = tf.contrib.layers.embed_sequence(
+            features[WORDS_FEATURE], vocab_size=params.n_words, embed_dim=params.embed_dim)
 
-    # Split into list of embedding per word, while removing doc length dim.
-    # word_list results to be a list of tensors [batch_size, EMBEDDING_SIZE].
-    word_list = tf.unstack(word_vectors, axis=1)
+        # Unpack word_vectors into a sequence of length max_doc_len,
+        # of tensors of dimension (num_docs, params.embed_dim),
+        # so that the RNN can given the n-th word of the document at the n-th step.
+        word_sequence = tf.unstack(word_vectors, axis=1)
 
-    # Create a Gated Recurrent Unit cell with hidden size of EMBEDDING_SIZE.
-    cell = tf.nn.rnn_cell.GRUCell(params.embed_dim)
+        # Create a Gated Recurrent Unit cell with hidden layer size params.embed_dim.
+        cell = tf.nn.rnn_cell.GRUCell(params.embed_dim)
 
-    # Create an unrolled Recurrent Neural Networks to length of
-    # MAX_DOCUMENT_LENGTH and passes word_list as inputs for each unit.
-    _, encoding = tf.nn.static_rnn(cell, word_list, dtype=tf.float32)
+        # Create an unrolled Recurrent Neural Networks of length params.max_doc_len.
+        _, encoding = tf.nn.static_rnn(cell, word_sequence, dtype=tf.float32)
 
-    # Given encoding of RNN, take encoding of last step (e.g hidden size of the
-    # neural network of last step) and pass it as features for softmax
-    # classification over output classes.
-    logits = tf.layers.dense(encoding, params.output_dim, activation=None)
+        # The output layer
+        logits = tf.layers.dense(encoding, params.output_dim, activation=None)
+
     return estimator_spec_for_softmax_classification(logits, labels, mode, params)
 
 

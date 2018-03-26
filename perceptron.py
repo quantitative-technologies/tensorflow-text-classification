@@ -19,8 +19,8 @@ def bag_of_words_perceptron_model(features, labels, mode, params):
     with tf.variable_scope('Perceptron'):
         bow_column = tf.feature_column.categorical_column_with_identity(
             WORDS_FEATURE, num_buckets=params.n_words)
-        # By default embeding_column combines the word embedding values by taking the mean value
-        # of the embedding values over the document words. Try weighted sum, via sqrtn?
+        # Maps sequences of integers < params.n_words to params.output_dim dimensional real-valued vectors
+        # by taking the mean over the word (i.e. integer index) embedding values.
         bow_embedding_column = tf.feature_column.embedding_column(
             bow_column, dimension=params.output_dim)
         logits = tf.feature_column.input_layer(

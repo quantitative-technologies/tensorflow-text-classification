@@ -260,7 +260,8 @@ def preprocess_data(flags, sequence_lengths=False):
     preprocessed_path = path.join(flags.model_dir, DATA_FILENAME)
     if path.isfile(preprocessed_path):
         with open(preprocessed_path, 'rb') as f:
-            train_raw, x_train, y_train, x_test, y_test, train_lengths, test_lengths, classes = pickle.load(f)
+            train_raw, x_train, y_train, x_test, y_test, \
+                train_lengths, test_lengths, classes = pickle.load(f)
     else:
         # Get the raw data, downloading it if necessary.
         train_raw, test_raw, classes = get_data(flags.data_dir)
@@ -273,15 +274,16 @@ def preprocess_data(flags, sequence_lengths=False):
         test_raw = shuffle(test_raw)
         train_sentences, y_train, test_sentences, y_test = extract_data(train_raw, test_raw)
         # Encode the raw data as integer vectors.
-        x_train, x_test, train_lengths, test_lengths, _, _ = process_vocabulary(train_sentences, test_sentences, flags,
-                                                                                reuse=True,
-                                                                                sequence_lengths=sequence_lengths)
+        x_train, x_test, train_lengths, test_lengths, _, _ = process_vocabulary(
+            train_sentences, test_sentences, flags,
+            reuse=True, sequence_lengths=sequence_lengths)
 
         # Save the processed data to avoid re-processing.
         saved = False
         with open(preprocessed_path, 'wb') as f:
             try:
-                pickle.dump([train_raw, x_train, y_train, x_test, y_test, train_lengths, test_lengths, classes], f)
+                pickle.dump([train_raw, x_train, y_train, x_test, y_test,
+                             train_lengths, test_lengths, classes], f)
                 saved = True
             except (OverflowError, MemoryError):
                 # Can happen if max-doc-len is large.

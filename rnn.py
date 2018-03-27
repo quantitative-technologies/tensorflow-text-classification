@@ -31,11 +31,8 @@ def rnn_model(features, labels, mode, params):
         # Create an unrolled Recurrent Neural Networks of length params.max_doc_len,
         # providing the length of each sequence (i.e. number of words in each document)
         # so that the output from the last element get propagated to the output layer.
-        if True:
-            _, encoding = tf.nn.static_rnn(cell, word_sequence, dtype=tf.float32,
-                                           sequence_length=features['LENGTHS_FEATURE'])
-        else:
-            _, encoding = tf.nn.static_rnn(cell, word_sequence, dtype=tf.float32)
+        _, encoding = tf.nn.static_rnn(cell, word_sequence, dtype=tf.float32,
+                                       sequence_length=features['LENGTHS_FEATURE'])
 
         # The output layer
         logits = tf.layers.dense(encoding, params.output_dim, activation=None)
@@ -59,7 +56,8 @@ def rnn():
 
     # Train the RNN model.
     tic()
-    run_experiment(x_train, y_train, x_test, y_test, rnn_model, 'train_and_evaluate', FLAGS, train_lengths, test_lengths)
+    run_experiment(x_train, y_train, x_test, y_test, rnn_model,
+                   'train_and_evaluate', FLAGS, train_lengths, test_lengths)
     toc()
 
     # Create metadata for TensorBoard Projector.

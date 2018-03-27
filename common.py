@@ -91,7 +91,7 @@ def create_parser_training(model_dir=None, n_epochs=None, batch_size=None, learn
     parser.add_argument(
         '--batch-size',
         default=batch_size,
-        help='Training batch size (default: {}). Use "None" for full batch training.'.format(batch_size))
+        help='Training batch size (default: {}). Use "full" for full batch training.'.format(batch_size))
     parser.add_argument(
         '--learning-rate',
         type=float,
@@ -133,7 +133,7 @@ def parse_arguments(parser):
         raise ValueError('Invalid verbosity argument.')
 
     if hasattr(flags, 'batch_size'):
-        if flags.batch_size == 'None':
+        if flags.batch_size == 'full':
             flags.batch_size = None
         else:
             flags.batch_size = int(flags.batch_size)

@@ -18,7 +18,7 @@ def query():
     FLAGS.output_dim = len(classes)
 
     queries = np.loadtxt(FLAGS.query_file, dtype=str, delimiter='\n')
-    _, x_query, _, _ = process_vocabulary(None, queries, FLAGS, reuse=True)
+    _, x_query, _, _, _, _ = process_vocabulary(None, queries, FLAGS, reuse=True)
 
     if FLAGS.model == 'perceptron':
         model = bag_of_words_perceptron_model

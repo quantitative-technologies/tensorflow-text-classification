@@ -1,16 +1,16 @@
 # tensorflow-text-classification
 ## Text Classification with the High-Level TensorFlow API
 
-This is the source code for the above titled article to be published in Medium (the article is not yet completed).
+This is the source code for the above titled article to be published in Medium (draft at: https://medium.com/quantitative-technologies/text-classification-with-the-high-level-tensorflow-api-390809987a4f).
 
 ### File Descriptions
 
+`perceptron.py` Trains and evaluates the **Perceptron** model.
+
 `perceptron_example.py` Runs the **Perceptron Example** in the article.
 
-`perceptron.py` Just trains and evaluates the model in the **Perceptron Example**.
+`mlp.py` Trains and evaluates the **Multilayer Perceptron** model.
 
-`mlp.py` Runs the **Multilayer Perceptron Example** in the article.
-
-`rnn.py` runs the **Recurrent Neural Network Example** in the article.
+`rnn.py` Trains and evaluates **Recurrent Neural Network** model.
 
 `common.py` Common routines used by the above code files.

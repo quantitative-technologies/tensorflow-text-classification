@@ -22,7 +22,7 @@ def rnn_model(features, labels, mode, params):
 
         # Unpack word_vectors into a sequence of length max_doc_len,
         # of tensors of dimension (num_docs, params.embed_dim),
-        # so that the RNN can given the n-th word of the document at the n-th step.
+        # so that the RNN is given the n-th word of the document at the n-th step.
         word_sequence = tf.unstack(word_vectors, axis=1)
 
         # Create a Gated Recurrent Unit cell with hidden layer size params.embed_dim.

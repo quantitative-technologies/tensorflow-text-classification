@@ -79,7 +79,7 @@ if __name__ == "__main__":
         '--word-meta-file',
         default=WORD_METADATA_FILENAME,
         help='Word embedding metadata filename (default: {})'.format(WORD_METADATA_FILENAME))
- 
+
     FLAGS = parse_arguments(parser)
 
     rnn()

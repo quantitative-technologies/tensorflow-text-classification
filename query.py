@@ -18,7 +18,8 @@ def query():
     FLAGS.output_dim = len(classes)
 
     queries = np.loadtxt(FLAGS.query_file, dtype=str, delimiter='\n')
-    _, x_query, _, _, _, _ = process_vocabulary(None, queries, FLAGS, reuse=True)
+    _, x_query, _, query_lengths, _, _ = process_vocabulary(
+        None, queries, FLAGS, reuse=True, sequence_lengths=FLAGS.model == 'rnn')
 
     if FLAGS.model == 'perceptron':
         model = bag_of_words_perceptron_model
@@ -29,7 +30,7 @@ def query():
     else:
         raise ValueError('unknown model')
 
-    classifications = predict(x_query, model, FLAGS)
+    classifications = predict(x_query, query_lengths, model, FLAGS)
     for i, query in enumerate(queries):
         print('The model classifies "{}" as a member of the class {}.'.format(
             query, classes['class'][classifications[i]]))

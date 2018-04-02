@@ -244,8 +244,8 @@ def process_vocabulary(train_sentences, test_sentences, flags,
     if sequence_lengths:
         def calculate_lengths(arr):
             return arr.shape[1] - (arr != 0)[:, ::-1].argmax(axis=1)
-        train_lengths = calculate_lengths(train_bow)
-        test_lengths = calculate_lengths(test_bow)
+        train_lengths = calculate_lengths(train_bow) if train_bow is not None else None
+        test_lengths = calculate_lengths(test_bow) if test_bow is not None else None
     else:
         train_lengths = test_lengths = None
 
@@ -366,7 +366,7 @@ def run_experiment(x_train, y_train, x_dev, y_dev, model_fn, schedule, flags, tr
         hparams=hparams)  # hyperparameters
 
 
-def predict(x_data, model_fn, flags):
+def predict(x_data, x_lengths, model_fn, flags):
     """Performs classification on the given x_data using the model given by model_fn."""
     hparams = tf.contrib.training.HParams(
         n_words=flags.max_vocab_size,
@@ -384,7 +384,7 @@ def predict(x_data, model_fn, flags):
         model_fn=model_fn,
         config=run_config,
         params=hparams
-    ).predict(input_fn(x_data, num_epochs=1), checkpoint_path=chkpt_path)
+    ).predict(input_fn(x_data, lengths=x_lengths, num_epochs=1), checkpoint_path=chkpt_path)
     return [p['class'] for p in predictions]
 
 

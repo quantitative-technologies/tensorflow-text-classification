@@ -428,9 +428,6 @@ def estimator_spec_for_softmax_classification(logits, labels, mode, params):
             predictions={
                 'class': predicted_class,
                 'prob': tf.nn.softmax(logits)
-            },
-            export_outputs={
-                'class': tf.estimator.export.PredictOutput(predicted_class)
             })
 
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)

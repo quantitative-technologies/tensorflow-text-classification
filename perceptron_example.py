@@ -8,7 +8,7 @@ from perceptron import bag_of_words_perceptron_model
 
 # Default values
 MODEL_DIRECTORY = 'perceptron_example_model'
-NUM_EPOCHS = 2
+NUM_EPOCHS = 1
 BATCH_SIZE = 64
 LEARNING_RATE = 0.05
 
@@ -40,8 +40,8 @@ def perceptron_example():
 
     print("\nProcessing the vocabulary...")
     tic()
-    x_train1, x_test1, vocab_processor, n_words = process_vocabulary(
-        x_train1_sentences, x_test1_sentences, FLAGS)
+    x_train1, x_test1, _, _, vocab_processor, n_words = process_vocabulary(
+        x_train1_sentences, x_test1_sentences, FLAGS, reuse=False)
     toc()
 
     # Train the model on the first split.
@@ -57,7 +57,7 @@ def perceptron_example():
 
     # Extend vocab_processor with the newly added training vocabulary, and save the vocabulary processor for later use.
     tic()
-    x_train2, x_test2, vocab_processor, n_words = process_vocabulary(
+    x_train2, x_test2, _, _, vocab_processor, n_words = process_vocabulary(
         x_train2_sentences, x_test2_sentences, FLAGS,
         reuse=False, vocabulary_processor=vocab_processor, extend=True)
     toc()

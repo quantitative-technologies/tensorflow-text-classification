@@ -1,7 +1,6 @@
 import tensorflow as tf
 
-from common import WORD_METADATA_FILENAME, SENTENCE_METADATA_FILENAME, WORDS_FEATURE, \
-    tic, toc, create_parser_training, parse_arguments, \
+from common import WORDS_FEATURE, tic, toc, create_parser_training, parse_arguments, \
     preprocess_data, run_experiment, estimator_spec_for_softmax_classification
 
 # Default values
@@ -48,14 +47,6 @@ def perceptron():
 # Run script ##############################################
 if __name__ == "__main__":
     parser = create_parser_training(MODEL_DIRECTORY, NUM_EPOCHS, BATCH_SIZE, LEARNING_RATE)
-    parser.add_argument(
-        '--word-meta-file',
-        default=WORD_METADATA_FILENAME,
-        help='Word embedding metadata filename (default: {})'.format(WORD_METADATA_FILENAME))
-    parser.add_argument(
-        '--sent-meta-file',
-        default=SENTENCE_METADATA_FILENAME,
-        help='Sentence embedding metadata filename (default: {})'.format(SENTENCE_METADATA_FILENAME))
 
     FLAGS = parse_arguments(parser)
 

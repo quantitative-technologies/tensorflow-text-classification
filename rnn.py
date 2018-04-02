@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from common import EMBEDDING_DIM, WORD_METADATA_FILENAME, SENTENCE_METADATA_FILENAME, WORDS_FEATURE, \
+from common import EMBEDDING_DIM, WORD_METADATA_FILENAME, WORDS_FEATURE, \
     tic, toc, create_parser_training, parse_arguments, \
     preprocess_data, run_experiment, create_metadata, estimator_spec_for_softmax_classification
 
@@ -79,11 +79,7 @@ if __name__ == "__main__":
         '--word-meta-file',
         default=WORD_METADATA_FILENAME,
         help='Word embedding metadata filename (default: {})'.format(WORD_METADATA_FILENAME))
-    parser.add_argument(
-        '--sent-meta-file',
-        default=SENTENCE_METADATA_FILENAME,
-        help='Sentence embedding metadata filename (default: {})'.format(SENTENCE_METADATA_FILENAME))
-
+ 
     FLAGS = parse_arguments(parser)
 
     rnn()

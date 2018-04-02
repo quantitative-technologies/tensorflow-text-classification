@@ -16,7 +16,6 @@ TF_SEED = 4242
 NP_SEED = 1234
 CHECKPOINTS_PER_EPOCH = 5
 WORD_METADATA_FILENAME = 'word_metadata.tsv'
-SENTENCE_METADATA_FILENAME = 'sentence_metadata.tsv'
 VOCAB_PROCESSOR_FILENAME = 'vocab_processor.pickle'
 DATA_FILENAME = 'data.pickle'
 VERBOSITY = 'info'
@@ -405,18 +404,6 @@ def create_metadata(train_raw, classes, flags):
             # Note that we left "extra room" for the vocabulary to grow.
             for i in range(len(vocab), flags.max_vocab_size):
                 f.write('%s\n' % vocabulary_processor.vocabulary_._unknown_token)
-
-    sentence_embedding_metadata_filename = flags.sent_meta_file
-    if not path.isfile(sentence_embedding_metadata_filename):
-        print("Creating sentence-embedding metadata for TensorBoard...")
-        # Create the sentence-embedding metadata file
-        with open(sentence_embedding_metadata_filename, 'w') as f:
-            f.write("Label\tTitle\tDocument\n")
-            for row in train_raw.itertuples():
-                label = classes.iloc[row[1] - 1].item()
-                title = row[2]
-                sent = row[3]
-                f.write("%s\t%s\t%s\n" % (label, title, sent))
 
 
 def estimator_spec_for_softmax_classification(logits, labels, mode, params):

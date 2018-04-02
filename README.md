@@ -1,7 +1,7 @@
 # tensorflow-text-classification
 ## Text Classification with the High-Level TensorFlow API
 
-This is the source code for the above titled article to be published in Medium (draft at: https://medium.com/quantitative-technologies/text-classification-with-the-high-level-tensorflow-api-390809987a4f).
+This is the source code for the Medium article: https://medium.com/quantitative-technologies/text-classification-with-the-high-level-tensorflow-api-390809987a4f
 
 ### File Descriptions
 

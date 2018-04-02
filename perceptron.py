@@ -15,7 +15,8 @@ def bag_of_words_perceptron_model(features, labels, mode, params):
     with tf.variable_scope('Perceptron'):
         bow_column = tf.feature_column.categorical_column_with_identity(
             WORDS_FEATURE, num_buckets=params.n_words)
-        # Maps sequences of integers < params.n_words to params.output_dim dimensional real-valued vectors
+        # Maps sequences of integers < params.n_words
+        # to params.output_dim dimensional real-valued vectors
         # by taking the mean over the word (i.e. integer index) embedding values.
         bow_embedding_column = tf.feature_column.embedding_column(
             bow_column, dimension=params.output_dim)
@@ -40,7 +41,8 @@ def perceptron():
 
     # Train and evaluate the model.
     tic()
-    run_experiment(x_train, y_train, x_test, y_test, bag_of_words_perceptron_model, 'train_and_evaluate', FLAGS)
+    run_experiment(x_train, y_train, x_test, y_test,
+                   bag_of_words_perceptron_model, 'train_and_evaluate', FLAGS)
     toc()
 
 

@@ -1,7 +1,4 @@
-from os import path, getcwd
-
 import tensorflow as tf
-from tensorflow.contrib.tensorboard.plugins import projector
 
 from common import WORD_METADATA_FILENAME, SENTENCE_METADATA_FILENAME, WORDS_FEATURE, \
     tic, toc, create_parser_training, parse_arguments, \

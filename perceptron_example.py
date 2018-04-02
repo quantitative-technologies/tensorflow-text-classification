@@ -4,7 +4,7 @@ from sklearn.utils import shuffle
 
 from common import get_data, extract_data, process_vocabulary, run_experiment, tic, toc, \
     create_parser_training, parse_arguments
-from perceptron import bag_of_words_perceptron
+from perceptron import bag_of_words_perceptron_model
 
 # Default values
 MODEL_DIRECTORY = 'perceptron_example_model'
@@ -47,7 +47,7 @@ def perceptron_example():
     # Train the model on the first split.
     tic()
     run_experiment(x_train1, y_train1, x_test1, y_test1,
-                   bag_of_words_perceptron, 'train_and_evaluate', FLAGS)
+                   bag_of_words_perceptron_model, 'train_and_evaluate', FLAGS)
     toc()
 
     # Next we perform incremental training with the 2nd half of the split data.
@@ -65,14 +65,14 @@ def perceptron_example():
     # Train the model on the second split.
     tic()
     run_experiment(x_train2, y_train2, x_test2, y_test2,
-                   bag_of_words_perceptron, 'train_and_evaluate', FLAGS)
+                   bag_of_words_perceptron_model, 'train_and_evaluate', FLAGS)
     toc()
 
     # We may be interested in the model performance on the training data
     # (e.g. to evaluate removable bias).
     print("\nEvaluation of the model performance on the training data.:")
     run_experiment(None, None, x_train1, y_train1,
-                   bag_of_words_perceptron, 'evaluate', FLAGS)
+                   bag_of_words_perceptron_model, 'evaluate', FLAGS)
 
 
 # Run script ##############################################

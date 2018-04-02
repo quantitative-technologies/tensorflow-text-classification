@@ -8,7 +8,7 @@ from perceptron import bag_of_words_perceptron_model
 
 # Default values
 MODEL_DIRECTORY = 'perceptron_example_model'
-NUM_EPOCHS = 1
+NUM_EPOCHS = 2
 BATCH_SIZE = 64
 LEARNING_RATE = 0.05
 
